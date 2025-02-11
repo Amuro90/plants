@@ -16,7 +16,7 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                sshagent(['credenziali']) {  // Use Jenkins credentials ID
+                sshagent(['credenzialigiuste']) {  // Use Jenkins credentials ID
                     sh '''
                     scp target/*.jar root@192.168.1.100:/home/app.jar
 
