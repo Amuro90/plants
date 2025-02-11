@@ -1,92 +1,28 @@
 pipeline {
     agent any
-    
-    tools {
-        jdk 'jdk17'
-        maven 'maven3'
-    }
-    
-    environment {
-        REMOTE_USER = 'your-username'
-        REMOTE_HOST = 'your-bpi-m2-zero-ip'
-        APP_DIR = '/opt/springapp'
-        JAR_NAME = 'your-artifact-name-0.0.1-SNAPSHOT.jar'
-    }
-    
+
     stages {
         stage('Checkout') {
             steps {
-                checkout scm
+                git branch: 'main', url: 'https://github.com/Amuro90/plants.git'
             }
         }
-        
+
         stage('Build') {
             steps {
-                sh 'mvn clean package -DskipTests'
+                sh 'mvn clean package'  // Adjust based on your build tool
             }
         }
-        
-        stage('Test') {
+
+        stage('Deploy') {
             steps {
-                sh 'mvn test'
-            }
-            post {
-                always {
-                    junit '**/target/surefire-reports/*.xml'
+                sshagent(['credenziali']) {  // Use Jenkins credentials ID
+                    sh '''
+                    scp target/*.jar root@192.168.1.100:/home/user/app.jar
+                    ssh root@b192.168.1.100 'java -jar /home/user/app.jar &'
+                    '''
                 }
             }
-        }
-        
-        stage('Deploy to BPI') {
-            steps {
-                script {
-                    // Create deployment directory
-                    sh """
-                        ssh ${REMOTE_USER}@${REMOTE_HOST} '
-                            mkdir -p ${APP_DIR}
-                        '
-                    """
-                    
-                    // Copy JAR file
-                    sh """
-                        scp target/${JAR_NAME} ${REMOTE_USER}@${REMOTE_HOST}:${APP_DIR}/app.jar
-                    """
-                    
-                    // Create or update service file
-                    sh """
-                        ssh ${REMOTE_USER}@${REMOTE_HOST} '
-                            echo "[Unit]
-                            Description=Spring Boot Application
-                            After=network.target
-
-                            [Service]
-                            User=${REMOTE_USER}
-                            WorkingDirectory=${APP_DIR}
-                            ExecStart=java -jar ${APP_DIR}/app.jar
-                            SuccessExitStatus=143
-                            TimeoutStopSec=10
-                            Restart=on-failure
-                            RestartSec=5
-
-                            [Install]
-                            WantedBy=multi-user.target" | sudo tee /etc/systemd/system/springapp.service
-                            
-                            sudo systemctl daemon-reload
-                            sudo systemctl restart springapp
-                            sudo systemctl enable springapp
-                        '
-                    """
-                }
-            }
-        }
-    }
-    
-    post {
-        success {
-            echo 'Pipeline completed successfully!'
-        }
-        failure {
-            echo 'Pipeline failed!'
         }
     }
 }
