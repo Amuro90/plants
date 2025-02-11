@@ -18,8 +18,8 @@ pipeline {
             steps {
                 sshagent(['credenziali']) {  // Use Jenkins credentials ID
                     sh '''
-                    scp target/*.jar root@192.168.1.100:/home/user/app.jar
-                    ssh root@b192.168.1.100 'java -jar /home/user/app.jar &'
+                    scp target/*.jar root@192.168.1.100:/home/app.jar
+                    ssh root@b192.168.1.100 'java -jar /home/app.jar &'
                     '''
                 }
             }
