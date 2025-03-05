@@ -17,6 +17,14 @@ pipeline {
             }
         }
 
-
+        stage('Deploy') {
+            steps {
+                withCredentials([sshUserPrivateKey(credentialsId: 'root', keyFileVariable: 'KEYFILE', usernameVariable: 'SSH_USER')]) {
+                    sh '''
+                        chmod +x /home/armbian/test/deploy.sh
+                        /home/armbian/test/deploy.sh
+                    '''
+                }
+            }
     }
 }
