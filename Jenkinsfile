@@ -16,15 +16,23 @@ pipeline {
                 sh 'mvn  clean package -Dmaven.test.skip=true'  // Adjust based on your build tool
             }
         }
+}
 
         stage('Deploy') {
             steps {
                 withCredentials([sshUserPrivateKey(credentialsId: 'root', keyFileVariable: 'KEYFILE', usernameVariable: 'SSH_USER')]) {
                     sh '''
-                        chmod +x /home/armbian/test/deploy.sh
-                        /home/armbian/test/deploy.sh
+                        chmod +x /usr/local/bin/deploy.sh
+                        /usr/local/bin/deploy.sh
                     '''
                 }
             }
+        }
     }
-}
+
+    // Ensure we have the post section closed correctly
+    post {
+        always {
+            // Add any necessary cleanup steps here
+        }
+
