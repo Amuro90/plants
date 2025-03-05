@@ -23,8 +23,7 @@ pipeline {
             steps {
                 withCredentials([sshUserPrivateKey(credentialsId: 'root', keyFileVariable: 'KEYFILE', usernameVariable: 'SSH_USER')]) {
                     sh '''
-                        chmod +x /var/lib/jenkins/workspace/deploy.sh
-                       /var/lib/jenkins/workspace/deploy.sh
+                        /var/lib/jenkins/workspace/deploy.sh
                     '''
                 }
             }
