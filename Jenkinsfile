@@ -33,6 +33,7 @@ pipeline {
 
     post {
         always {
+            echo 'Cleaning up...'
             // Add any necessary cleanup steps here
         }
     }
