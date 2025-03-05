@@ -2,7 +2,7 @@ pipeline {
     agent any
     tools {
         git 'Git 2.43' // Replace 'Git 2.43' with the name you gave to your Git tool configuration
-        maven 'Maven' // Ensure Maven is also properly configured
+        maven 'Maven 3.8.7' // Ensure Maven is also properly configured
     }
     stages {
         stage('Checkout') {
